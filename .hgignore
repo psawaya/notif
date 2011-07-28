@@ -1,0 +1,11 @@
+bin
+build
+DS_Store$
+include
+lib
+lib64
+NotifServer.egg-info
+Python$
+pyc$
+swp$
+var

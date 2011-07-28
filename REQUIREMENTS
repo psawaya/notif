@@ -1,0 +1,6 @@
+http://hg.mozilla.org/services/server-core/
+webtest
+Can only run notifserver/tests/clientagent.py from /notifs
+
+erlang+ssl
+

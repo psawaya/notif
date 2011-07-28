@@ -1,0 +1,1 @@
+a=RabbitMQStorage(virtual_host= '/', http_port= 55672, host= 'localhost', amqp_port= 5672, username= 'admin', routing_queue_name= 'wait_queue', pool_recycle= 3600, backend= 'rabbitmq', incoming_exchange_name= 'incoming_exchange', password= 'admin')

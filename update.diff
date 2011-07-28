@@ -1,0 +1,64 @@
+diff -r 926e483644c1 etc/memory.conf
+--- a/etc/memory.conf	Mon Apr 25 17:39:33 2011 -0700
++++ b/etc/memory.conf	Thu Jul 07 17:04:16 2011 -0700
+@@ -1,10 +1,10 @@
+ [auth]
+-backend = sql
++backend = services.auth.sql.SQLAuth
+ sqluri = sqlite:////tmp/test.db
+ pool_size = 100
+ pool_recycle = 3600
+ 
+ [messagestorage]
+-backend = memory 
++backend = services.storage.memory.MemoryStorage
+ host = DONTUSETHISITWONTWORK 
+ amqp_port = 5672 
+diff -r 926e483644c1 etc/rabbitmq.conf
+--- a/etc/rabbitmq.conf	Mon Apr 25 17:39:33 2011 -0700
++++ b/etc/rabbitmq.conf	Thu Jul 07 17:04:16 2011 -0700
+@@ -1,11 +1,11 @@
+ [auth]
+-backend = sql
++backend = services.auth.sql.SQLAuth
+ sqluri = sqlite:////tmp/test.db
+ pool_size = 100
+ pool_recycle = 3600
+ 
+ [messagestorage]
+-backend = rabbitmq
++backend =  notifserver.storage.rabbitmq.RabbitMQStorage
+ username = admin
+ password = admin
+ host = localhost
+diff -r 926e483644c1 notifserver/storage/__init__.py
+--- a/notifserver/storage/__init__.py	Mon Apr 25 17:39:33 2011 -0700
++++ b/notifserver/storage/__init__.py	Thu Jul 07 17:04:16 2011 -0700
+@@ -38,7 +38,7 @@
+ import abc
+ import logging
+ 
+-from services.pluginreg import PluginRegistry
++from services.pluginreg import (PluginRegistry, load_and_configure)
+ 
+ 
+ # Use this logger for all MessageStorage plugins
+@@ -147,17 +147,4 @@
+         """
+ 
+ def get_message_backend(config):
+-    try:
+-        from notifserver.storage.rabbitmq import RabbitMQStorage
+-        MessageStorage.register(RabbitMQStorage)
+-    except ImportError:
+-        pass
+-
+-    try:
+-        from notifserver.storage.memory import MemoryStorage
+-        MessageStorage.register(MemoryStorage)
+-    except ImportError:
+-        pass
+-
+-    return MessageStorage.get_from_config(config)
+-
++    return load_and_configure(config, 'messagestorage')
