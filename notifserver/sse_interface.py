@@ -46,8 +46,6 @@ class SSEServer(object):
         self.config = config
         self.conn = None
         
-        self.makeAMQPConnection()
-        
         self.webapp = self.makeWebFrontend()
         self.webapp.listen(8888)
         
@@ -62,10 +60,8 @@ class SSEServer(object):
         def notifsCallback(msg):
             if callback:
                 callback(msg)
-            print " [x] Received %r \n \n for token %s" % (msg.body, token)
                 
         def on_connect():
-            print "on_connect"
             ch = self.conn.channel()
             ch.queue_declare(queue=token, durable=True, exclusive=False, auto_delete=False)
             ch.consume(token, notifsCallback, no_ack=True)
@@ -80,27 +76,30 @@ class SSEServer(object):
         
         class NotificationsWebHandler(tornado.web.RequestHandler):
             @tornado.web.asynchronous
-            def get(self, token):
+            def get(self, token):   
                 self.set_header("Content-Type","text/event-stream")        
                 self.set_header("Cache-Control","no-cache")        
                 self.set_header("Connection","keep-alive")
 
                 self.notifID = 0
-
+                
                 self.flush()
                 
                 def callbackFunc(msg):
                     self.publishNotification(msg.body)
 
                 thisSSE.makeAMQPConnection(token, callbackFunc)
-
+            
+            @tornado.web.asynchronous
             def publishNotification(self, notifData):
                 self.write("id: %i\n" % self.notifID)
                 self.write("data:")
                 self.write(notifData)
+                self.write("\n\n")
+                self.flush()
 
                 self.notifID+=1
-        
+            
         routes = [
             (r"/feed/(.*)", NotificationsWebHandler)
         ]

@@ -63,6 +63,9 @@ are (starting from the root project directory)
 2. Run "bin/paster serve development.ini" to start the
    POST Office and Client Agent HTTP server.
 
+3. Run bin/python notifserver/sse_interface.py to start
+	serving notifications over SSE.
+
 Monitoring the Server:
 ----------------------
 You can monitor the RabbitMQ server once it has started by 
